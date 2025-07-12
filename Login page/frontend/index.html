@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="card">
+    <h1>Register</h1>
+    <input type="text" id="registerUsername" placeholder="Username" />
+    <input type="password" id="registerPassword" placeholder="Password" />
+    <button onclick="register()">Register</button>
+    <p id="registerMessage" class="message"></p>
+
+    <!-- 🔁 Link to login -->
+    <p class="switch">Already have an account? <a href="login.html">Login here</a></p>
+  </div>
+
+  <script>
+    async function register() {
+      const username = document.getElementById("registerUsername").value;
+      const password = document.getElementById("registerPassword").value;
+      const msg = document.getElementById("registerMessage");
+      msg.innerText = "";
+
+      const res = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const text = await res.text();
+      msg.style.color = res.ok ? "lightgreen" : "red";
+      msg.innerText = (res.ok ? "✅ " : "❌ ") + text;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="card">
+    <h1>Login</h1>
+    <input type="text" id="loginUsername" placeholder="Username" />
+    <input type="password" id="loginPassword" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" class="error"></p>
+
+    <!-- 🔁 Link to register -->
+    <p class="switch">Not registered yet? <a href="index.html">Sign up here</a></p>
+  </div>
+
+  <script>
+    async function login() {
+      const username = document.getElementById("loginUsername").value;
+      const password = document.getElementById("loginPassword").value;
+      const error = document.getElementById("loginError");
+      error.innerText = "";
+
+      const res = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const text = await res.text();
+      if (res.ok) {
+        window.location.href = "index2.html";
+      } else {
+        error.innerText = "❌ " + text;
+      }
+    }
+  </script>
+</body>
+</html>
