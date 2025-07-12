@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackIt - Q&A Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 25px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .filter-btn {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            border: 2px solid transparent;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            color: #667eea;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
+        }
+
+        .filter-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            margin-top: 8px;
+            display: none;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        .filter-options.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-option {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .filter-option:hover {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: linear-gradient(white, white) padding-box, linear-gradient(45deg, #667eea, #764ba2) border-box;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-input:focus {
+            border-color: transparent;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2), 0 8px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .questions-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .question-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .question-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .question-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .answers-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .answers-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .answer-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .answer-card.verified {
+            border-left-color: #4caf50;
+            background: #e8f5e8;
+        }
+
+        .answer-card.top-voted {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .answer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .answer-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .verified-badge {
+            background: #4caf50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .vote-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vote-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .vote-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .vote-btn.upvoted {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .verify-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8em;
+            transition: all 0.3s ease;
+        }
+
+        .verify-btn:hover {
+            background: #45a049;
+        }
+
+        .verify-btn.verified {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .page-btn {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .answers-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .answers-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .answers-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .answers-scroll::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .answers-scroll::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .answer-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .time-ago {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .question-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-bar {
+                max-width: none;
+            }
+            
+            .question-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .answer-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+
+        /* Question Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.4em;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .question-detail {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .question-detail-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .question-detail-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .question-detail-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .answer-form {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .answer-form h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+
+        .answer-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .answer-textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .answer-form-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            gap: 15px;
+        }
+
+        .submit-answer-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .submit-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .submit-answer-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .answers-count {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .modal-answers-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-answer-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .modal-answer-card.verified {
+            border-left-color: #4caf50;
+            background: #e8f5e8;
+        }
+
+        .modal-answer-card.top-voted {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+
+        .modal-answer-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .formatting-help {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <div class="logo">StackIt</div>
+                <div class="user-profile" onclick="openUserProfile()">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center;">👤</div>
+                    <span>Profile</span>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-primary" onclick="askQuestion()">Ask New Question</button>
+                
+                <div class="filter-dropdown">
+                    <div class="filter-btn" onclick="toggleFilter()">
+                        <span id="filter-text">Newest</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="filter-options" id="filter-options">
+                        <div class="filter-option" onclick="setFilter('newest')">Newest</div>
+                        <div class="filter-option" onclick="setFilter('unanswered')">Unanswered</div>
+                        <div class="filter-option" onclick="setFilter('most-answers')">Most Answers</div>
+                        <div class="filter-option" onclick="setFilter('most-voted')">Most Voted</div>
+                    </div>
+                </div>
+                
+                <div class="search-bar">
+                    <div class="search-icon">🔍</div>
+                    <input type="text" class="search-input" placeholder="Search questions..." id="search-input" onkeyup="searchQuestions()">
+                </div>
+            </div>
+        </div>
+
+        <div class="questions-container">
+            <div id="questions-list">
+                <!-- Questions will be populated here -->
+            </div>
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Pagination buttons will be generated here -->
+        </div>
+
+        <!-- Question Detail Modal -->
+        <div class="modal" id="questionModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Question Details</h2>
+                    <button class="close-btn" onclick="closeQuestionModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="question-detail" id="questionDetail">
+                        <!-- Question details will be populated here -->
+                    </div>
+                    
+                    <div class="answer-form">
+                        <h3>Your Answer</h3>
+                        <textarea class="answer-textarea" id="answerText" placeholder="Share your knowledge and help the community..."></textarea>
+                        <div class="answer-form-footer">
+                            <span class="formatting-help">Tip: Be clear and provide examples when possible</span>
+                            <button class="submit-answer-btn" onclick="submitAnswer()" id="submitBtn">Post Answer</button>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-answers-section" id="modalAnswersSection">
+                        <div class="answers-count" id="answersCount">0 Answers</div>
+                        <div id="modalAnswersList">
+                            <!-- Answers will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data - in real application, this would come from database
+        let questionsData = [
+            {
+                id: 1,
+                title: "How to join 2 columns in a data set to make a separate column in SQL?",
+                content: "I do not know the code for it as I am a beginner. As an example what I need to do is like there is a column 1 containing First name and column 2 consists of last name I want a column 3 combine...",
+                author: "User Name",
+                time: "5 mins ago",
+                tags: ["SQL", "Database"],
+                answers: [
+                    {
+                        id: 1,
+                        content: "You can use the CONCAT function in SQL: SELECT CONCAT(first_name, ' ', last_name) AS full_name FROM your_table;",
+                        author: "Expert Dev",
+                        time: "3 mins ago",
+                        votes: 15,
+                        verified: true,
+                        upvoted: false
+                    },
+                    {
+                        id: 2,
+                        content: "Another approach is to use the || operator: SELECT first_name || ' ' || last_name AS full_name FROM your_table;",
+                        author: "SQL Master",
+                        time: "2 mins ago",
+                        votes: 8,
+                        verified: false,
+                        upvoted: false
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Best practices for React component optimization",
+                content: "What are the most effective ways to optimize React components for better performance?",
+                author: "React Dev",
+                time: "10 mins ago",
+                tags: ["React", "Performance"],
+                answers: [
+                    {
+                        id: 3,
+                        content: "Use React.memo for functional components and useMemo/useCallback hooks to prevent unnecessary re-renders.",
+                        author: "Frontend Expert",
+                        time: "8 mins ago",
+                        votes: 12,
+                        verified: false,
+                        upvoted: false
+                    },
+                    {
+                        id: 4,
+                        content: "Implement lazy loading with React.lazy() and Suspense for code splitting.",
+                        author: "Performance Guru",
+                        time: "7 mins ago",
+                        votes: 18,
+                        verified: true,
+                        upvoted: false
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Python list comprehension vs loops performance",
+                content: "Which is more efficient: list comprehensions or traditional for loops in Python?",
+                author: "Python Learner",
+                time: "15 mins ago",
+                tags: ["Python", "Performance"],
+                answers: [
+                    {
+                        id: 5,
+                        content: "List comprehensions are generally faster because they're optimized at the C level in CPython.",
+                        author: "Python Expert",
+                        time: "12 mins ago",
+                        votes: 25,
+                        verified: true,
+                        upvoted: false
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "How to implement authentication in Node.js?",
+                content: "Looking for secure authentication implementation patterns in Node.js applications.",
+                author: "Backend Dev",
+                time: "20 mins ago",
+                tags: ["Node.js", "Authentication"],
+                answers: []
+            }
+        ];
+
+        let currentPage = 1;
+        let questionsPerPage = 3;
+        let currentFilter = 'newest';
+        let filteredQuestions = [...questionsData];
+        let currentQuestionId = null;
+
+        function renderQuestions() {
+            const startIndex = (currentPage - 1) * questionsPerPage;
+            const endIndex = startIndex + questionsPerPage;
+            const questionsToShow = filteredQuestions.slice(startIndex, endIndex);
+
+            const questionsList = document.getElementById('questions-list');
+            questionsList.innerHTML = '';
+
+            questionsToShow.forEach(question => {
+                const questionCard = createQuestionCard(question);
+                questionsList.appendChild(questionCard);
+            });
+
+            renderPagination();
+        }
+
+        function createQuestionCard(question) {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.onclick = () => openQuestionModal(question.id);
+            
+            const sortedAnswers = [...question.answers].sort((a, b) => {
+                if (a.verified && !b.verified) return -1;
+                if (!a.verified && b.verified) return 1;
+                return b.votes - a.votes;
+            });
+
+            card.innerHTML = `
+                <div class="question-header">
+                    <div>
+                        <div class="question-title">${question.title}</div>
+                        <div class="question-content">${question.content}</div>
+                        <div class="tags">
+                            ${question.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="question-stats">
+                        <div class="stat">
+                            <span>📝</span>
+                            <span>${question.answers.length} answers</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question-meta">
+                    <span>Asked by <strong>${question.author}</strong></span>
+                    <span class="time-ago">${question.time}</span>
+                </div>
+
+                ${question.answers.length > 0 ? `
+                    <div class="answers-section">
+                        <div class="answers-header">
+                            <h4>${question.answers.length} Answer${question.answers.length > 1 ? 's' : ''}</h4>
+                        </div>
+                        <div class="answers-scroll">
+                            ${sortedAnswers.slice(0, 2).map(answer => createAnswerHTML(answer, question.id)).join('')}
+                            ${sortedAnswers.length > 2 ? `<div style="text-align: center; padding: 10px; color: #666; font-style: italic;">Click to view ${sortedAnswers.length - 2} more answers...</div>` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+
+            return card;
+        }
+
+        function createAnswerHTML(answer, questionId) {
+            const answerClass = answer.verified ? 'verified' : (answer.votes > 15 ? 'top-voted' : '');
+            
+            return `
+                <div class="answer-card ${answerClass}">
+                    <div class="answer-header">
+                        <div class="answer-meta">
+                            <strong>${answer.author}</strong>
+                            <span class="time-ago">${answer.time}</span>
+                            ${answer.verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="vote-section">
+                                <button class="vote-btn ${answer.upvoted ? 'upvoted' : ''}" onclick="toggleUpvote(${answer.id})">
+                                    <span>👍</span>
+                                    <span>${answer.votes}</span>
+                                </button>
+                            </div>
+                            ${!answer.verified ? `
+                                <button class="verify-btn" onclick="verifyAnswer(${answer.id}, ${questionId})">
+                                    Mark as Correct
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="answer-content">${answer.content}</div>
+                </div>
+            `;
+        }
+
+        function toggleUpvote(answerId) {
+            questionsData.forEach(question => {
+                question.answers.forEach(answer => {
+                    if (answer.id === answerId) {
+                        if (answer.upvoted) {
+                            answer.votes--;
+                            answer.upvoted = false;
+                        } else {
+                            answer.votes++;
+                            answer.upvoted = true;
+                        }
+                    }
+                });
+            });
+            applyFilter();
+        }
+
+        function verifyAnswer(answerId, questionId) {
+            questionsData.forEach(question => {
+                if (question.id === questionId) {
+                    question.answers.forEach(answer => {
+                        if (answer.id === answerId) {
+                            answer.verified = true;
+                        }
+                    });
+                }
+            });
+            applyFilter();
+        }
+
+        function toggleFilter() {
+            const filterOptions = document.getElementById('filter-options');
+            filterOptions.classList.toggle('active');
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('filter-text').textContent = filter.charAt(0).toUpperCase() + filter.slice(1).replace('-', ' ');
+            document.getElementById('filter-options').classList.remove('active');
+            currentPage = 1;
+            applyFilter();
+        }
+
+        function applyFilter() {
+            switch (currentFilter) {
+                case 'newest':
+                    filteredQuestions = [...questionsData];
+                    break;
+                case 'unanswered':
+                    filteredQuestions = questionsData.filter(q => q.answers.length === 0);
+                    break;
+                case 'most-answers':
+                    filteredQuestions = [...questionsData].sort((a, b) => b.answers.length - a.answers.length);
+                    break;
+                case 'most-voted':
+                    filteredQuestions = [...questionsData].sort((a, b) => {
+                        const aMaxVotes = a.answers.length > 0 ? Math.max(...a.answers.map(ans => ans.votes)) : 0;
+                        const bMaxVotes = b.answers.length > 0 ? Math.max(...b.answers.map(ans => ans.votes)) : 0;
+                        return bMaxVotes - aMaxVotes;
+                    });
+                    break;
+            }
+            renderQuestions();
+        }
+
+        function searchQuestions() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            if (searchTerm === '') {
+                applyFilter();
+                return;
+            }
+            
+            filteredQuestions = questionsData.filter(question => 
+                question.title.toLowerCase().includes(searchTerm) ||
+                question.content.toLowerCase().includes(searchTerm) ||
+                question.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+            );
+            currentPage = 1;
+            renderQuestions();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredQuestions.length / questionsPerPage);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            if (totalPages <= 1) return;
+
+            // Previous button
+            if (currentPage > 1) {
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'page-btn';
+                prevBtn.textContent = '←';
+                prevBtn.onclick = () => changePage(currentPage - 1);
+                pagination.appendChild(prevBtn);
+            }
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => changePage(i);
+                pagination.appendChild(pageBtn);
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'page-btn';
+                nextBtn.textContent = '→';
+                nextBtn.onclick = () => changePage(currentPage + 1);
+                pagination.appendChild(nextBtn);
+            }
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderQuestions();
+        }
+
+        function askQuestion() {
+            alert('Ask New Question feature - This would open a form to submit a new question');
+        }
+
+        function openUserProfile() {
+            alert('User Profile - This would open the user profile page');
+        }
+
+        function openQuestionModal(questionId) {
+            currentQuestionId = questionId;
+            const question = questionsData.find(q => q.id === questionId);
+            if (!question) return;
+
+            const modal = document.getElementById('questionModal');
+            const questionDetail = document.getElementById('questionDetail');
+            const modalAnswersSection = document.getElementById('modalAnswersSection');
+            const answersCount = document.getElementById('answersCount');
+            const modalAnswersList = document.getElementById('modalAnswersList');
+
+            // Populate question details
+            questionDetail.innerHTML = `
+                <div class="question-detail-title">${question.title}</div>
+                <div class="question-detail-content">${question.content}</div>
+                <div class="tags">
+                    ${question.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+                <div class="question-detail-meta">
+                    <span>Asked by <strong>${question.author}</strong></span>
+                    <span class="time-ago">${question.time}</span>
+                </div>
+            `;
+
+            // Update answers count
+            answersCount.textContent = `${question.answers.length} Answer${question.answers.length !== 1 ? 's' : ''}`;
+
+            // Populate answers
+            const sortedAnswers = [...question.answers].sort((a, b) => {
+                if (a.verified && !b.verified) return -1;
+                if (!a.verified && b.verified) return 1;
+                return b.votes - a.votes;
+            });
+
+            modalAnswersList.innerHTML = sortedAnswers.map(answer => createModalAnswerHTML(answer, questionId)).join('');
+
+            // Show modal
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeQuestionModal() {
+            const modal = document.getElementById('questionModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentQuestionId = null;
+            
+            // Clear answer form
+            document.getElementById('answerText').value = '';
+        }
+
+        function createModalAnswerHTML(answer, questionId) {
+            const answerClass = answer.verified ? 'verified' : (answer.votes > 15 ? 'top-voted' : '');
+            
+            return `
+                <div class="modal-answer-card ${answerClass}">
+                    <div class="answer-header">
+                        <div class="answer-meta">
+                            <strong>${answer.author}</strong>
+                            <span class="time-ago">${answer.time}</span>
+                            ${answer.verified ? '<span class="verified-badge">✓ Verified</span>' : ''}
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="vote-section">
+                                <button class="vote-btn ${answer.upvoted ? 'upvoted' : ''}" onclick="toggleUpvoteModal(${answer.id})">
+                                    <span>👍</span>
+                                    <span>${answer.votes}</span>
+                                </button>
+                            </div>
+                            ${!answer.verified ? `
+                                <button class="verify-btn" onclick="verifyAnswerModal(${answer.id}, ${questionId})">
+                                    Mark as Correct
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="answer-content">${answer.content}</div>
+                </div>
+            `;
+        }
+
+        function submitAnswer() {
+            const answerText = document.getElementById('answerText').value.trim();
+            if (!answerText) {
+                alert('Please enter your answer');
+                return;
+            }
+
+            const question = questionsData.find(q => q.id === currentQuestionId);
+            if (!question) return;
+
+            // Create new answer
+            const newAnswer = {
+                id: Date.now(), // Simple ID generation
+                content: answerText,
+                author: "Current User", // In real app, this would be the logged-in user
+                time: "just now",
+                votes: 0,
+                verified: false,
+                upvoted: false
+            };
+
+            // Add answer to question
+            question.answers.push(newAnswer);
+
+            // Refresh the modal content
+            openQuestionModal(currentQuestionId);
+            
+            // Clear the form
+            document.getElementById('answerText').value = '';
+            
+            // Show success message
+            alert('Answer submitted successfully!');
+        }
+
+        function toggleUpvoteModal(answerId) {
+            questionsData.forEach(question => {
+                question.answers.forEach(answer => {
+                    if (answer.id === answerId) {
+                        if (answer.upvoted) {
+                            answer.votes--;
+                            answer.upvoted = false;
+                        } else {
+                            answer.votes++;
+                            answer.upvoted = true;
+                        }
+                    }
+                });
+            });
+            
+            // Refresh modal content
+            openQuestionModal(currentQuestionId);
+        }
+
+        function verifyAnswerModal(answerId, questionId) {
+            questionsData.forEach(question => {
+                if (question.id === questionId) {
+                    question.answers.forEach(answer => {
+                        if (answer.id === answerId) {
+                            answer.verified = true;
+                        }
+                    });
+                }
+            });
+            
+            // Refresh modal content
+            openQuestionModal(currentQuestionId);
+        }
+
+        // Close filter dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const filterDropdown = document.querySelector('.filter-dropdown');
+            if (!filterDropdown.contains(event.target)) {
+                document.getElementById('filter-options').classList.remove('active');
+            }
+        });
+
+        // Initialize the page
+        applyFilter();
+    </script>
+</body>
+</html>
